@@ -1,0 +1,13 @@
+{{define "title"}}{{.Dataset.Title}} · Data Frontend{{end}}
+{{define "content"}}
+<nav class="breadcrumb"><a href="/">← All data</a></nav>
+<h1 class="page-title">{{.Dataset.Title}}</h1>
+{{if .Dataset.Subtitle}}<p class="lede">{{.Dataset.Subtitle}}</p>{{end}}
+
+{{range .Charts}}{{template "chart_section" .}}{{end}}
+{{if not .Charts}}<p class="lede">No charts available for this dataset yet.</p>{{end}}
+
+<script src="/static/vendor/d3.min.js"></script>
+<script src="/static/vendor/plot.umd.min.js"></script>
+<script src="/static/chart.js"></script>
+{{end}}

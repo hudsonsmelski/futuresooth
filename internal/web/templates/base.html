@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1f2933">
+  <title>{{block "title" .}}Data Frontend{{end}}</title>
+  <link rel="manifest" href="/static/manifest.webmanifest">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">Data Frontend</a>
+    <span class="brand-sub">One Place to Monitor the Future</span>
+  </header>
+  <main class="container">
+    {{template "content" .}}
+  </main>
+  <footer class="site-footer">
+    <p>Sources: U.S. Bureau of Labor Statistics · seasonally adjusted</p>
+  </footer>
+</body>
+</html>

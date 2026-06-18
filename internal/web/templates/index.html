@@ -1,0 +1,17 @@
+{{define "title"}}Data Frontend{{end}}
+{{define "content"}}
+<h1 class="page-title">Data Frontend</h1>
+<p class="lede">Browse U.S. government data. Select a dataset to view its charts.</p>
+<ul class="card-grid">
+  {{range .Datasets}}
+  <li class="card">
+    <a class="card-link" href="/d/{{.Slug}}">
+      <span class="card-title">{{.Title}}</span>
+      {{if .Subtitle}}<span class="card-sub">{{.Subtitle}}</span>{{end}}
+    </a>
+  </li>
+  {{else}}
+  <li class="card card-empty">No datasets available.</li>
+  {{end}}
+</ul>
+{{end}}

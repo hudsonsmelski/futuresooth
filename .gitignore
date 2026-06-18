@@ -1,0 +1,15 @@
+# Secrets — never commit
+.env
+
+# Runtime data cache (persisted BLS series + exports)
+/data/
+
+# Build output
+/bin/
+*.exe
+
+# Claude Code machine-local settings
+.claude/settings.local.json
+
+# OS / editor cruft
+.DS_Store

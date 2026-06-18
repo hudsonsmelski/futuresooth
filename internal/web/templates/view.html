@@ -1,0 +1,10 @@
+{{define "title"}}{{.Section.Chart.Title}} · Data Frontend{{end}}
+{{define "content"}}
+<nav class="breadcrumb"><a href="/">← All data</a></nav>
+
+{{template "chart_section" .Section}}
+
+<script src="/static/vendor/d3.min.js"></script>
+<script src="/static/vendor/plot.umd.min.js"></script>
+<script src="/static/chart.js"></script>
+{{end}}

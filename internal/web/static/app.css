@@ -1,0 +1,124 @@
+/* Mobile-first styles for the unemployment data viewer. */
+:root {
+  --bg: #ffffff;
+  --fg: #1f2933;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --accent: #1f6feb;
+  --card-bg: #f9fafb;
+  --maxw: 880px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1419;
+    --fg: #e6e8eb;
+    --muted: #9aa4b2;
+    --line: #2a2f37;
+    --accent: #58a6ff;
+    --card-bg: #161b22;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+.brand { font-weight: 650; color: var(--fg); text-decoration: none; }
+.brand-sub { color: var(--muted); font-size: 0.85rem; }
+
+.container {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 1rem 1rem 2rem;
+}
+
+.page-title { font-size: 1.4rem; margin: 0.6rem 0 0.3rem; }
+.lede { color: var(--muted); margin: 0 0 1rem; }
+
+.breadcrumb { margin: 0.4rem 0 0.2rem; }
+.breadcrumb a, .error-box a { color: var(--accent); text-decoration: none; }
+.breadcrumb a:hover, .error-box a:hover { text-decoration: underline; }
+
+/* Card grid: single column on phones, multi-column when there's room. */
+.card-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+@media (min-width: 560px) {
+  .card-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card-bg);
+}
+.card-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  text-decoration: none;
+  color: var(--fg);
+  min-height: 84px;
+}
+.card-link:hover { border-color: var(--accent); }
+.card-title { font-weight: 600; }
+.card-sub { color: var(--muted); font-size: 0.88rem; }
+.card-meta { color: var(--muted); font-size: 0.8rem; margin-top: auto; }
+.card-empty { padding: 1rem; color: var(--muted); }
+
+/* Charts: a vertical list of chart blocks. */
+.chart-block {
+  margin: 1.5rem 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+.chart-block:first-of-type { border-top: none; padding-top: 0.25rem; }
+.chart-title { font-size: 1.1rem; margin: 0 0 0.15rem; }
+.chart-sub { color: var(--muted); font-size: 0.88rem; margin: 0 0 0.5rem; }
+.chart { width: 100%; }
+.chart figure { margin: 0; } /* Plot wraps output in a <figure> when a legend is shown */
+.chart-caption { color: var(--muted); font-size: 0.82rem; margin-top: 0.5rem; }
+
+/* Observable Plot hover tooltip: force readable white-on-dark in any theme.
+   By default the tip box uses --plot-background (white), so in dark mode the
+   light page text became unreadable against it. */
+[aria-label="tip"] path {
+  fill: #1f2933 !important;
+  stroke: rgba(255, 255, 255, 0.18) !important;
+}
+[aria-label="tip"] text {
+  fill: #f5f7fa !important;
+}
+
+.site-footer {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.error-box { padding: 1.5rem 0; }
