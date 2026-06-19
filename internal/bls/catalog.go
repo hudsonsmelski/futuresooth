@@ -62,6 +62,18 @@ var Catalog = map[string]SeriesMeta{
 	"LNS14000060": {ID: "LNS14000060", Label: "25–54 yrs", Description: "Unemployment rate, 25 to 54 years", Units: "percent", SeasonallyAdjusted: true},
 	"LNS14000048": {ID: "LNS14000048", Label: "25+ yrs", Description: "Unemployment rate, 25 years and over", Units: "percent", SeasonallyAdjusted: true},
 	"LNS14024230": {ID: "LNS14024230", Label: "55+ yrs", Description: "Unemployment rate, 55 years and over", Units: "percent", SeasonallyAdjusted: true},
+
+	// Consumer Price Index (CPI-U, U.S. city average, seasonally adjusted). These
+	// are index levels (1982-84=100); the inflation views rebase them to a common
+	// base of 100 for cross-category comparison. (CU = CPI Urban consumers, SR =
+	// seasonally adjusted, 0000 = U.S. city average.)
+	"CUSR0000SA0":  {ID: "CUSR0000SA0", Label: "All items", Description: "CPI-U, all items", Units: "index", SeasonallyAdjusted: true},
+	"CUSR0000SAF1": {ID: "CUSR0000SAF1", Label: "Food", Description: "CPI-U, food and beverages", Units: "index", SeasonallyAdjusted: true},
+	"CUSR0000SA0E": {ID: "CUSR0000SA0E", Label: "Energy", Description: "CPI-U, energy", Units: "index", SeasonallyAdjusted: true},
+	"CUSR0000SAH":  {ID: "CUSR0000SAH", Label: "Housing", Description: "CPI-U, housing", Units: "index", SeasonallyAdjusted: true},
+	"CUSR0000SAT":  {ID: "CUSR0000SAT", Label: "Transportation", Description: "CPI-U, transportation", Units: "index", SeasonallyAdjusted: true},
+	"CUSR0000SAM":  {ID: "CUSR0000SAM", Label: "Medical care", Description: "CPI-U, medical care", Units: "index", SeasonallyAdjusted: true},
+	"CUSR0000SAE":  {ID: "CUSR0000SAE", Label: "Education & communication", Description: "CPI-U, education and communication", Units: "index", SeasonallyAdjusted: true},
 }
 
 // CatalogIDs returns all known series IDs (order is unspecified).

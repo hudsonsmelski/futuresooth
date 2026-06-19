@@ -22,6 +22,10 @@ Datasets:
   [GCAT](https://planet4589.org/space/gcat) — Jonathan McDowell's General Catalog
   of Artificial Space Objects (CC-BY; cite as
   *data from GCAT (J. McDowell, planet4589.org/space/gcat)*).
+- **Inflation** — U.S. consumer prices (CPI-U) by category, split into volatile
+  (food, energy, transport) and sticky (housing, medical, education) groups,
+  each rebased to 100 at a common month for comparison, from the
+  [Bureau of Labor Statistics](https://www.bls.gov/).
 
 ## Configuration
 

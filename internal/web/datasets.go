@@ -24,6 +24,12 @@ var datasets = []Dataset{
 		Subtitle:  "Orbital launch activity from GCAT (J. McDowell)",
 		KeyPrefix: "space-",
 	},
+	{
+		Slug:      "inflation",
+		Title:     "Inflation",
+		Subtitle:  "U.S. consumer prices by category (BLS CPI)",
+		KeyPrefix: "inflation-",
+	},
 }
 
 // datasetBySlug returns the dataset with the given slug, if it exists.

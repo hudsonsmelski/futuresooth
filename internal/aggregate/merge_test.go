@@ -117,6 +117,44 @@ func TestMergeAnnualView(t *testing.T) {
 	}
 }
 
+// TestMergeRebase checks that a rebased view normalizes every series to 100 at
+// the earliest month they all share, leaving relative growth intact.
+func TestMergeRebase(t *testing.T) {
+	a := bls.Series{
+		ID: "A", Label: "A",
+		Points: []bls.Point{
+			{Date: "2000-01", Value: ptr(200)}, // base for A
+			{Date: "2000-02", Value: ptr(220)}, // +10%
+		},
+	}
+	b := bls.Series{
+		ID: "B", Label: "B",
+		Points: []bls.Point{
+			// no 2000-01 -> common base is 2000-02
+			{Date: "2000-02", Value: ptr(50)},
+			{Date: "2000-03", Value: ptr(75)}, // +50% vs base
+		},
+	}
+	view := View{Key: "x", SeriesIDs: []string{"A", "B"}, Rebase: true}
+	chart := Merge(view, map[string]bls.Series{a.ID: a, b.ID: b}, "", "")
+
+	// Axis: 2000-01, 2000-02, 2000-03. Common base = 2000-02 (index 1).
+	av := chart.Series[0].Values
+	bv := chart.Series[1].Values
+	if av[1] == nil || *av[1] != 100 {
+		t.Errorf("A at base = %v, want 100", av[1])
+	}
+	if bv[1] == nil || *bv[1] != 100 {
+		t.Errorf("B at base = %v, want 100", bv[1])
+	}
+	if av[0] == nil || *av[0] != 90.909090909090907 { // 200/220*100
+		t.Errorf("A before base = %v, want ~90.91", av[0])
+	}
+	if bv[2] == nil || *bv[2] != 150 { // 75/50*100
+		t.Errorf("B after base = %v, want 150", bv[2])
+	}
+}
+
 func TestMergeRespectsRange(t *testing.T) {
 	men := bls.Series{
 		ID: "LNS14000001", Label: "Men, 16+", SeasonallyAdjusted: true,

@@ -134,7 +134,47 @@ func Merge(v View, seriesByID map[string]bls.Series, start, end string) ChartDat
 
 	out.SeasonallyAdjusted = anySeries && allSA
 	out.Meta.FetchedAt = oldestFetch
+	if v.Rebase {
+		rebase(out.Series)
+	}
 	return out
+}
+
+// rebase normalizes each series to 100 at the earliest axis position where every
+// series has a (non-zero) value, so series with different bases/levels become
+// directly comparable. It's a no-op when the series never share a populated
+// position. Points before the base remain (rendered relative to it, below 100).
+func rebase(series []ChartSeries) {
+	if len(series) == 0 {
+		return
+	}
+	base := -1
+	for i := 0; i < len(series[0].Values); i++ {
+		all := true
+		for _, s := range series {
+			if i >= len(s.Values) || s.Values[i] == nil || *s.Values[i] == 0 {
+				all = false
+				break
+			}
+		}
+		if all {
+			base = i
+			break
+		}
+	}
+	if base < 0 {
+		return
+	}
+	for si := range series {
+		b := *series[si].Values[base]
+		for i, v := range series[si].Values {
+			if v == nil {
+				continue
+			}
+			scaled := *v / b * 100
+			series[si].Values[i] = &scaled
+		}
+	}
 }
 
 // inRange reports whether date is within [start, end] (inclusive). Empty bounds

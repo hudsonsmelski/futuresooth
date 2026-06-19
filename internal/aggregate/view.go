@@ -25,6 +25,10 @@ type View struct {
 	// SeriesIDs. Empty entries (or a short/absent slice) fall back to the
 	// default color scheme.
 	Colors []string `json:"colors,omitempty"`
+	// Rebase normalizes every series to 100 at the earliest month they all share,
+	// so series with different bases/levels (e.g. CPI index series) become
+	// directly comparable.
+	Rebase bool `json:"rebase,omitempty"`
 }
 
 // gcatCitation is the CC-BY attribution required for GCAT-sourced views.
@@ -105,6 +109,27 @@ var Views = []View{
 		Slug:      "orbital_launch_outcomes",
 		Source:    gcatCitation,
 		Annual:    true,
+	},
+
+	// --- Inflation (BLS CPI). Index levels rebased to 100 at the common base
+	// month so categories are comparable. "All items" anchors both charts. ---
+	{
+		Key:       "inflation-volatile",
+		Title:     "Inflation: Food, Energy & Transport",
+		Subtitle:  "CPI by category, rebased to 100 at the common start month",
+		Units:     "index (start = 100)",
+		SeriesIDs: []string{"CUSR0000SA0", "CUSR0000SAF1", "CUSR0000SA0E", "CUSR0000SAT"},
+		Slug:      "inflation_food_energy_transport",
+		Rebase:    true,
+	},
+	{
+		Key:       "inflation-sticky",
+		Title:     "Inflation: Housing, Medical & Education",
+		Subtitle:  "CPI by category, rebased to 100 at the common start month",
+		Units:     "index (start = 100)",
+		SeriesIDs: []string{"CUSR0000SA0", "CUSR0000SAH", "CUSR0000SAM", "CUSR0000SAE"},
+		Slug:      "inflation_housing_medical_education",
+		Rebase:    true,
 	},
 }
 
