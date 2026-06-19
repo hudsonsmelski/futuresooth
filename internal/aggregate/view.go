@@ -17,7 +17,18 @@ type View struct {
 	// (e.g. "unemployment_rate_by_sex" -> .json and .csv). Falls back to the key
 	// with dashes turned into underscores when empty.
 	Slug string `json:"slug,omitempty"`
+	// Source overrides the default attribution for this view (empty = BLS default).
+	Source string `json:"source,omitempty"`
+	// Annual marks a view whose axis steps are years ("YYYY") rather than months.
+	Annual bool `json:"annual,omitempty"`
+	// Colors optionally sets per-line CSS colors, positionally aligned to
+	// SeriesIDs. Empty entries (or a short/absent slice) fall back to the
+	// default color scheme.
+	Colors []string `json:"colors,omitempty"`
 }
+
+// gcatCitation is the CC-BY attribution required for GCAT-sourced views.
+const gcatCitation = "GCAT (J. McDowell, planet4589.org/space/gcat)"
 
 // FileBase returns the base filename (no extension) for this view's data files.
 func (v View) FileBase() string {
@@ -59,8 +70,41 @@ var Views = []View{
 		Title:     "Unemployment Rate by Age",
 		Subtitle:  "Seasonally adjusted",
 		Units:     "percent",
-		SeriesIDs: []string{"LNS14000012", "LNS14000060", "LNS14024230"},
+		SeriesIDs: []string{"LNS14024887", "LNS14000060", "LNS14024230"},
 		Slug:      "unemployment_rate_by_age",
+	},
+
+	// --- Space industry (GCAT). Yearly series; IDs match internal/gcat output. ---
+	{
+		Key:       "space-by-country",
+		Title:     "Orbital Launches by Country",
+		Subtitle:  "Orbital launch attempts per year, by launching state",
+		Units:     "launches",
+		SeriesIDs: []string{"gcat-country-usa", "gcat-country-china", "gcat-country-russia", "gcat-country-other"},
+		Slug:      "orbital_launches_by_country",
+		Source:    gcatCitation,
+		Annual:    true,
+	},
+	{
+		Key:       "space-mass",
+		Title:     "Mass to Orbit by Country",
+		Subtitle:  "Cataloged payload mass reaching orbit per year, by owner state",
+		Units:     "tonnes",
+		SeriesIDs: []string{"gcat-mass-usa", "gcat-mass-china", "gcat-mass-russia", "gcat-mass-other"},
+		Slug:      "mass_to_orbit_by_country",
+		Source:    gcatCitation,
+		Annual:    true,
+	},
+	{
+		Key:       "space-outcomes",
+		Title:     "Orbital Launch Outcomes",
+		Subtitle:  "Successful vs. failed orbital launches per year",
+		Units:     "launches",
+		SeriesIDs: []string{"gcat-orbital-successes", "gcat-orbital-failures"},
+		Colors:    []string{"#2ca02c", "#d62728"}, // success green, failure red
+		Slug:      "orbital_launch_outcomes",
+		Source:    gcatCitation,
+		Annual:    true,
 	},
 }
 

@@ -18,6 +18,12 @@ var datasets = []Dataset{
 		Subtitle:  "U.S. unemployment rate from the Bureau of Labor Statistics",
 		KeyPrefix: "unemployment-",
 	},
+	{
+		Slug:      "space",
+		Title:     "Space Industry",
+		Subtitle:  "Orbital launch activity from GCAT (J. McDowell)",
+		KeyPrefix: "space-",
+	},
 }
 
 // datasetBySlug returns the dataset with the given slug, if it exists.

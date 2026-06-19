@@ -30,6 +30,14 @@ func (c *Cache) Get(id string) (bls.Series, bool) {
 	return s, ok
 }
 
+// Has reports whether a series with the given ID is cached.
+func (c *Cache) Has(id string) bool {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+	_, ok := c.series[id]
+	return ok
+}
+
 // All returns a snapshot of every cached series, sorted by ID.
 func (c *Cache) All() []bls.Series {
 	c.lock.RLock()

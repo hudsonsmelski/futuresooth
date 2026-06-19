@@ -7,8 +7,9 @@ import (
 	"github.com/hudsonsmelski/futuresooth/internal/bls"
 )
 
-// Source is the attribution string included with every chart payload.
-const Source = "U.S. Bureau of Labor Statistics"
+// defaultSource is the attribution used for views that don't set their own
+// View.Source (the original BLS unemployment views).
+const defaultSource = "U.S. Bureau of Labor Statistics"
 
 // ChartData is the chart-ready JSON payload: a shared x-axis plus one entry per
 // series, with values aligned to that axis (nil where a series has no data for
@@ -25,23 +26,27 @@ type ChartData struct {
 	Meta               ChartMeta     `json:"meta"`
 }
 
-// Axis is the shared category axis (months as "YYYY-MM").
+// Axis is the shared category axis: months as "YYYY-MM", or years as "YYYY".
 type Axis struct {
 	Label  string   `json:"label"`
 	Values []string `json:"values"`
 }
 
 // ChartSeries is one line: values are positionally aligned to Axis.Values.
+// Color is an optional presentation hint (CSS color) for this line.
 type ChartSeries struct {
 	ID     string     `json:"id"`
 	Label  string     `json:"label"`
 	Values []*float64 `json:"values"`
+	Color  string     `json:"color,omitempty"`
 }
 
-// ChartMeta carries provenance for the merged payload.
+// ChartMeta carries provenance for the merged payload. Period is the human word
+// for one axis step ("months" or "years"), used in chart captions.
 type ChartMeta struct {
 	FetchedAt time.Time `json:"fetched_at"`
 	Points    int       `json:"points"`
+	Period    string    `json:"period"`
 }
 
 // Merge aligns the view's series (looked up in seriesByID) onto the union of all
@@ -73,21 +78,30 @@ func Merge(v View, seriesByID map[string]bls.Series, start, end string) ChartDat
 		pos[d] = i
 	}
 
+	axisLabel, period := "Month", "months"
+	if v.Annual {
+		axisLabel, period = "Year", "years"
+	}
+	source := defaultSource
+	if v.Source != "" {
+		source = v.Source
+	}
+
 	out := ChartData{
 		Key:      v.Key,
 		Title:    v.Title,
 		Subtitle: v.Subtitle,
 		Units:    v.Units,
-		Source:   Source,
-		X:        Axis{Label: "Month", Values: dates},
-		Meta:     ChartMeta{Points: len(dates)},
+		Source:   source,
+		X:        Axis{Label: axisLabel, Values: dates},
+		Meta:     ChartMeta{Points: len(dates), Period: period},
 	}
 
 	allSA := true
 	anySeries := false
 	var oldestFetch time.Time
 
-	for _, id := range v.SeriesIDs {
+	for i, id := range v.SeriesIDs {
 		s, ok := seriesByID[id]
 		if !ok {
 			continue
@@ -102,14 +116,19 @@ func Merge(v View, seriesByID map[string]bls.Series, start, end string) ChartDat
 
 		values := make([]*float64, len(dates))
 		for _, p := range s.Points {
-			if i, ok := pos[p.Date]; ok {
-				values[i] = p.Value
+			if j, ok := pos[p.Date]; ok {
+				values[j] = p.Value
 			}
+		}
+		color := ""
+		if i < len(v.Colors) {
+			color = v.Colors[i]
 		}
 		out.Series = append(out.Series, ChartSeries{
 			ID:     s.ID,
 			Label:  s.Label,
 			Values: values,
+			Color:  color,
 		})
 	}
 
