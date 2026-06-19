@@ -16,9 +16,21 @@ import (
 	"github.com/hudsonsmelski/futuresooth/internal/cache"
 	"github.com/hudsonsmelski/futuresooth/internal/config"
 	"github.com/hudsonsmelski/futuresooth/internal/export"
+	"github.com/hudsonsmelski/futuresooth/internal/gcat"
 	"github.com/hudsonsmelski/futuresooth/internal/httpapi"
 	"github.com/hudsonsmelski/futuresooth/internal/refresh"
 )
+
+// blsSource adapts the BLS client (which fetches a fixed ID list) to the
+// refresh.Source interface.
+type blsSource struct {
+	client *bls.Client
+	ids    []string
+}
+
+func (s blsSource) Fetch(ctx context.Context, startYear, endYear int) ([]bls.Series, error) {
+	return s.client.FetchSeries(ctx, s.ids, startYear, endYear)
+}
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lmsgprefix)
@@ -56,10 +68,15 @@ func main() {
 	}
 
 	client := bls.NewClient(cfg.BLSAPIKey, cfg.RequestTimeout)
-
-	// Refresh everything in the catalog (views only reference catalog IDs).
 	ids := bls.CatalogIDs()
-	refresher := refresh.New(client, store, exporter, ids, cfg.StartYear, cfg.RefreshInterval)
+
+	// Each source pulls its own series into the shared cache. BLS pulls the
+	// unemployment catalog; GCAT pulls space-industry launch/satellite data.
+	sources := []refresh.Source{
+		blsSource{client: client, ids: ids},
+		gcat.New(0),
+	}
+	refresher := refresh.New(sources, store, exporter, aggregate.AllSeriesIDs(), cfg.StartYear, cfg.RefreshInterval)
 
 	go refresher.Run(ctx)
 

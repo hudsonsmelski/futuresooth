@@ -1,6 +1,6 @@
 // Renders every chart registered by the server in window.__CHARTS__ (keyed by the
 // chart container's DOM id), using Observable Plot (the global `Plot`). Each wide
-// payload (shared month axis + per-series value arrays) is reshaped into tidy long
+// payload (shared time axis + per-series value arrays) is reshaped into tidy long
 // rows, keeping nulls so Plot breaks each line at gaps rather than drawing through.
 (function () {
   if (typeof Plot === "undefined") return;
@@ -8,20 +8,32 @@
   const entries = Object.entries(registry);
   if (entries.length === 0) return;
 
-  const parseMonth = (ym) => {
-    const [y, m] = ym.split("-").map(Number);
-    return new Date(y, m - 1, 1);
+  // Axis values are either "YYYY-MM" (monthly) or a bare "YYYY" (yearly).
+  const parseAxisDate = (v) => {
+    const [y, m] = v.split("-").map(Number);
+    return new Date(y, (m || 1) - 1, 1);
   };
 
   function buildRows(chart) {
-    const months = chart.x.values.map(parseMonth);
+    const dates = chart.x.values.map(parseAxisDate);
     const rows = [];
     for (const s of chart.series) {
-      for (let i = 0; i < months.length; i++) {
-        rows.push({ date: months[i], series: s.label, value: s.values[i] });
+      for (let i = 0; i < dates.length; i++) {
+        rows.push({ date: dates[i], series: s.label, value: s.values[i] });
       }
     }
     return rows;
+  }
+
+  // colorScale builds an explicit color mapping when every series carries a
+  // color hint; otherwise it falls back to Plot's default scheme.
+  function colorScale(chart, multi) {
+    const opt = { legend: multi };
+    if (multi && chart.series.every((s) => s.color)) {
+      opt.domain = chart.series.map((s) => s.label);
+      opt.range = chart.series.map((s) => s.color);
+    }
+    return opt;
   }
 
   function renderOne(el, chart) {
@@ -36,7 +48,7 @@
       marginBottom: 32,
       x: { type: "time", label: null, grid: true },
       y: { label: yLabel, grid: true, zero: true },
-      color: { legend: multi },
+      color: colorScale(chart, multi),
       marks: [
         Plot.ruleY([0]),
         Plot.lineY(rows, {

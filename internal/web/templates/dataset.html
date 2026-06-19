@@ -1,9 +1,10 @@
-{{define "title"}}{{.Dataset.Title}} · Data Frontend{{end}}
+{{define "title"}}{{.Dataset.Title}} · FutureSooth{{end}}
+{{define "header_info"}}
+<div class="header-info">
+  <span class="header-info-title">{{.Dataset.Title}}</span>
+</div>
+{{end}}
 {{define "content"}}
-<nav class="breadcrumb"><a href="/">← All data</a></nav>
-<h1 class="page-title">{{.Dataset.Title}}</h1>
-{{if .Dataset.Subtitle}}<p class="lede">{{.Dataset.Subtitle}}</p>{{end}}
-
 {{range .Charts}}{{template "chart_section" .}}{{end}}
 {{if not .Charts}}<p class="lede">No charts available for this dataset yet.</p>{{end}}
 

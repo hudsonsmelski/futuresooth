@@ -1,4 +1,4 @@
-/* Mobile-first styles for the unemployment data viewer. */
+/* Mobile-first styles for the FutureSooth data viewer. */
 :root {
   --bg: #ffffff;
   --fg: #1f2933;
@@ -31,16 +31,56 @@ body {
   font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* Sticky single-line top bar: stays put as the page scrolls. Needs a solid
+   background so content scrolls underneath it. */
 .site-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem 0.75rem;
-  padding: 0.9rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
-.brand { font-weight: 650; color: var(--fg); text-decoration: none; }
-.brand-sub { color: var(--muted); font-size: 0.85rem; }
+/* The whole top bar is one link to home, so the entire padded area is clickable.
+   Everything stays on one line (nowrap); overflow truncates with an ellipsis. */
+.site-header-link {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+  padding: 0.7rem 1rem;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+}
+.brand { font-weight: 650; color: var(--fg); white-space: nowrap; flex-shrink: 0; }
+.brand-sub {
+  color: var(--muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* The current section's title, shown right-aligned in the top bar on one line. */
+.header-info {
+  margin-left: auto;
+  min-width: 0;
+  overflow: hidden;
+}
+.header-info-title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+/* On narrow screens the tagline is the first thing to drop, leaving room for the
+   brand and the current page's info. */
+@media (max-width: 559px) {
+  .brand-sub { display: none; }
+}
 
 .container {
   max-width: var(--maxw);
@@ -51,9 +91,8 @@ body {
 .page-title { font-size: 1.4rem; margin: 0.6rem 0 0.3rem; }
 .lede { color: var(--muted); margin: 0 0 1rem; }
 
-.breadcrumb { margin: 0.4rem 0 0.2rem; }
-.breadcrumb a, .error-box a { color: var(--accent); text-decoration: none; }
-.breadcrumb a:hover, .error-box a:hover { text-decoration: underline; }
+.error-box a { color: var(--accent); text-decoration: none; }
+.error-box a:hover { text-decoration: underline; }
 
 /* Card grid: single column on phones, multi-column when there's room. */
 .card-grid {

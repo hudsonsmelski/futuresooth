@@ -82,6 +82,41 @@ func TestMergeAlignsOnDateUnion(t *testing.T) {
 	}
 }
 
+// TestMergeAnnualView checks that an annual view yields a "YYYY" axis labeled
+// "Year", a "years" period, and uses the view's own Source attribution.
+func TestMergeAnnualView(t *testing.T) {
+	attempts := bls.Series{
+		ID: "gcat-orbital-attempts", Label: "Attempts",
+		Points: []bls.Point{
+			{Date: "2023", Value: ptr(223)},
+			{Date: "2024", Value: ptr(259)},
+		},
+	}
+	view := View{
+		Key:       "space-launches",
+		Title:     "Orbital Launch Attempts",
+		Units:     "launches",
+		SeriesIDs: []string{"gcat-orbital-attempts"},
+		Source:    "GCAT (J. McDowell, planet4589.org/space/gcat)",
+		Annual:    true,
+	}
+	chart := Merge(view, map[string]bls.Series{attempts.ID: attempts}, "", "")
+
+	if chart.X.Label != "Year" {
+		t.Errorf("x.label = %q, want %q", chart.X.Label, "Year")
+	}
+	if chart.Meta.Period != "years" {
+		t.Errorf("meta.period = %q, want %q", chart.Meta.Period, "years")
+	}
+	if chart.Source != view.Source {
+		t.Errorf("source = %q, want %q", chart.Source, view.Source)
+	}
+	wantX := []string{"2023", "2024"}
+	if len(chart.X.Values) != 2 || chart.X.Values[0] != wantX[0] || chart.X.Values[1] != wantX[1] {
+		t.Fatalf("x = %v, want %v", chart.X.Values, wantX)
+	}
+}
+
 func TestMergeRespectsRange(t *testing.T) {
 	men := bls.Series{
 		ID: "LNS14000001", Label: "Men, 16+", SeasonallyAdjusted: true,

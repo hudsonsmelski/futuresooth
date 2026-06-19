@@ -3,7 +3,7 @@
   <h2 class="chart-title">{{.Chart.Title}}</h2>
   {{if .Chart.Subtitle}}<p class="chart-sub">{{.Chart.Subtitle}}</p>{{end}}
   <div class="chart" id="{{.DomID}}" role="img" aria-label="{{.Chart.Title}} line chart"></div>
-  <p class="chart-caption">{{.Chart.Meta.Points}} months · source: {{.Chart.Source}}</p>
+  <p class="chart-caption">{{.Chart.Meta.Points}} {{.Chart.Meta.Period}} · source: {{.Chart.Source}}</p>
   <script>window.__CHARTS__=window.__CHARTS__||{};window.__CHARTS__[{{.DomID}}]={{.JSON}};</script>
 </section>
 {{end}}

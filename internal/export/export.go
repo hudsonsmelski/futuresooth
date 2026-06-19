@@ -1,7 +1,8 @@
 // Package export persists curated views to disk as descriptive, human-friendly
 // files: one chart-ready JSON and one wide CSV per view (e.g.
-// unemployment_rate_by_sex.json / .csv). The CSV has a "month" column plus one
-// column per series, so it opens and plots directly in a spreadsheet. These
+// unemployment_rate_by_sex.json / .csv). The CSV has a date column (month or
+// year) plus one column per series, so it opens and plots directly in a
+// spreadsheet. These
 // files are also the source the service restores from on boot.
 package export
 
@@ -13,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/hudsonsmelski/futuresooth/internal/aggregate"
 	"github.com/hudsonsmelski/futuresooth/internal/bls"
@@ -105,8 +107,8 @@ func (e *Exporter) writeJSON(base string, chart aggregate.ChartData) error {
 	return e.writeFileAtomic(base+".json", data)
 }
 
-// writeCSV writes a wide CSV: a "month" column followed by one column per series
-// (header = series label). Missing values are left as empty cells.
+// writeCSV writes a wide CSV: a date column ("month" or "year") followed by one
+// column per series (header = series label). Missing values are left as empty cells.
 func (e *Exporter) writeCSV(base string, chart aggregate.ChartData) error {
 	tmp := filepath.Join(e.dir, base+".csv.tmp")
 	final := filepath.Join(e.dir, base+".csv")
@@ -118,7 +120,7 @@ func (e *Exporter) writeCSV(base string, chart aggregate.ChartData) error {
 	w := csv.NewWriter(f)
 
 	header := make([]string, 0, len(chart.Series)+1)
-	header = append(header, "month")
+	header = append(header, strings.ToLower(chart.X.Label)) // "month" or "year"
 	for _, s := range chart.Series {
 		header = append(header, s.Label)
 	}
@@ -127,9 +129,9 @@ func (e *Exporter) writeCSV(base string, chart aggregate.ChartData) error {
 		return err
 	}
 
-	for i, month := range chart.X.Values {
+	for i, date := range chart.X.Values {
 		row := make([]string, 0, len(chart.Series)+1)
-		row = append(row, month)
+		row = append(row, date)
 		for _, s := range chart.Series {
 			if v := s.Values[i]; v != nil {
 				row = append(row, strconv.FormatFloat(*v, 'f', -1, 64))
