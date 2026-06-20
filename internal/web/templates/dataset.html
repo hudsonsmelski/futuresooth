@@ -5,7 +5,9 @@
 </div>
 {{end}}
 {{define "content"}}
+<div class="chart-grid">
 {{range .Charts}}{{template "chart_section" .}}{{end}}
+</div>
 {{if not .Charts}}<p class="lede">No charts available for this dataset yet.</p>{{end}}
 
 <script src="/static/vendor/d3.min.js"></script>

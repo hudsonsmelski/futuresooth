@@ -14,6 +14,7 @@ import (
 	"github.com/hudsonsmelski/futuresooth/internal/aggregate"
 	"github.com/hudsonsmelski/futuresooth/internal/bls"
 	"github.com/hudsonsmelski/futuresooth/internal/cache"
+	"github.com/hudsonsmelski/futuresooth/internal/census"
 	"github.com/hudsonsmelski/futuresooth/internal/config"
 	"github.com/hudsonsmelski/futuresooth/internal/export"
 	"github.com/hudsonsmelski/futuresooth/internal/gcat"
@@ -71,10 +72,12 @@ func main() {
 	ids := bls.CatalogIDs()
 
 	// Each source pulls its own series into the shared cache. BLS pulls the
-	// unemployment catalog; GCAT pulls space-industry launch/satellite data.
+	// unemployment + CPI catalog; GCAT pulls space-industry launch/satellite
+	// data; Census pulls population data.
 	sources := []refresh.Source{
 		blsSource{client: client, ids: ids},
 		gcat.New(0),
+		census.New(cfg.CensusAPIKey, cfg.RequestTimeout, store.Get),
 	}
 	refresher := refresh.New(sources, store, exporter, aggregate.AllSeriesIDs(), cfg.StartYear, cfg.RefreshInterval)
 

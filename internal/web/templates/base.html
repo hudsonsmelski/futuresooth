@@ -7,6 +7,11 @@
   <title>{{block "title" .}}FutureSooth{{end}}</title>
   <link rel="manifest" href="/static/manifest.webmanifest">
   <link rel="stylesheet" href="/static/app.css">
+  <!-- Apply a saved theme before first paint to avoid a flash of the wrong theme.
+       With no saved choice, CSS falls back to the OS preference. -->
+  <script>
+    try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
 </head>
 <body>
   <header class="site-header">
@@ -15,12 +20,38 @@
       {{block "brand_sub" .}}{{end}}
       {{block "header_info" .}}{{end}}
     </a>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme">🌙</button>
   </header>
   <main class="container">
     {{template "content" .}}
   </main>
   <footer class="site-footer">
-    <p><a href="https://github.com/hudsonsmelski/futuresooth">hudsonsmelski</a></p>
+    <p>Created by <a href="https://github.com/hudsonsmelski/futuresooth">Hudson Smelski</a> with help from Claude Code</p>
   </footer>
+  <script>
+    (function () {
+      var btn = document.querySelector(".theme-toggle");
+      if (!btn) return;
+      var root = document.documentElement;
+      var prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+      function effective() {
+        return root.dataset.theme || (prefersDark.matches ? "dark" : "light");
+      }
+      function sync() {
+        var dark = effective() === "dark";
+        btn.textContent = dark ? "☀️" : "🌙";
+        btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+      }
+      btn.addEventListener("click", function () {
+        var next = effective() === "dark" ? "light" : "dark";
+        root.dataset.theme = next;
+        try { localStorage.setItem("theme", next); } catch (e) {}
+        sync();
+      });
+      // Keep the icon correct when following the OS and it changes.
+      prefersDark.addEventListener("change", function () { if (!root.dataset.theme) sync(); });
+      sync();
+    })();
+  </script>
 </body>
 </html>

@@ -30,6 +30,12 @@ var datasets = []Dataset{
 		Subtitle:  "U.S. consumer prices by category (BLS CPI)",
 		KeyPrefix: "inflation-",
 	},
+	{
+		Slug:      "population",
+		Title:     "Population",
+		Subtitle:  "U.S. population by age, race, and Hispanic origin (Census Bureau)",
+		KeyPrefix: "population-",
+	},
 }
 
 // datasetBySlug returns the dataset with the given slug, if it exists.

@@ -29,10 +29,16 @@ type View struct {
 	// so series with different bases/levels (e.g. CPI index series) become
 	// directly comparable.
 	Rebase bool `json:"rebase,omitempty"`
+	// Chart selects a non-default renderer ("" = line, "pyramid" = back-to-back
+	// population pyramid whose x-axis values are categories, e.g. age bands).
+	Chart string `json:"chart,omitempty"`
 }
 
 // gcatCitation is the CC-BY attribution required for GCAT-sourced views.
 const gcatCitation = "GCAT (J. McDowell, planet4589.org/space/gcat)"
+
+// censusCitation is the attribution for U.S. Census Bureau views.
+const censusCitation = "U.S. Census Bureau (PEP, ACS)"
 
 // FileBase returns the base filename (no extension) for this view's data files.
 func (v View) FileBase() string {
@@ -130,6 +136,39 @@ var Views = []View{
 		SeriesIDs: []string{"CUSR0000SA0", "CUSR0000SAH", "CUSR0000SAM", "CUSR0000SAE"},
 		Slug:      "inflation_housing_medical_education",
 		Rebase:    true,
+	},
+
+	// --- Population (U.S. Census Bureau). IDs match internal/census output. ---
+	{
+		Key:       "population-pyramid",
+		Title:     "Population by Age & Sex",
+		Subtitle:  "U.S. resident population by 5-year age group and sex (latest estimate)",
+		Units:     "people",
+		SeriesIDs: []string{"census-pyramid-male", "census-pyramid-female"},
+		Colors:    []string{"#1f6feb", "#d6336c"}, // male blue, female magenta
+		Slug:      "population_by_age_sex",
+		Source:    censusCitation,
+		Chart:     "pyramid",
+	},
+	{
+		Key:       "population-by-race",
+		Title:     "Population by Race",
+		Subtitle:  "U.S. population by race per year (ACS 1-year)",
+		Units:     "people",
+		SeriesIDs: []string{"census-race-white", "census-race-black", "census-race-natives", "census-race-asian", "census-race-multi"},
+		Slug:      "population_by_race",
+		Source:    censusCitation,
+		Annual:    true,
+	},
+	{
+		Key:       "population-by-hispanic",
+		Title:     "Population by Hispanic Origin",
+		Subtitle:  "U.S. population by Hispanic origin per year (ACS 1-year)",
+		Units:     "people",
+		SeriesIDs: []string{"census-hisp-hispanic", "census-hisp-nonhispanic"},
+		Slug:      "population_by_hispanic_origin",
+		Source:    censusCitation,
+		Annual:    true,
 	},
 }
 

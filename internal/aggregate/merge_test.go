@@ -155,6 +155,29 @@ func TestMergeRebase(t *testing.T) {
 	}
 }
 
+// TestMergePyramid checks that a pyramid view carries its chart type and an
+// "Age" axis with the category x-values intact.
+func TestMergePyramid(t *testing.T) {
+	male := bls.Series{ID: "m", Label: "Male", Points: []bls.Point{
+		{Date: "00-04", Value: ptr(9)}, {Date: "05-09", Value: ptr(10)},
+	}}
+	female := bls.Series{ID: "f", Label: "Female", Points: []bls.Point{
+		{Date: "00-04", Value: ptr(8)}, {Date: "05-09", Value: ptr(9)},
+	}}
+	view := View{Key: "p", SeriesIDs: []string{"m", "f"}, Chart: "pyramid"}
+	chart := Merge(view, map[string]bls.Series{"m": male, "f": female}, "", "")
+
+	if chart.Chart != "pyramid" {
+		t.Errorf("chart = %q, want pyramid", chart.Chart)
+	}
+	if chart.X.Label != "Age" || chart.Meta.Period != "age groups" {
+		t.Errorf("axis=%q period=%q, want Age/age groups", chart.X.Label, chart.Meta.Period)
+	}
+	if len(chart.X.Values) != 2 || chart.X.Values[0] != "00-04" {
+		t.Errorf("x = %v, want [00-04 05-09]", chart.X.Values)
+	}
+}
+
 func TestMergeRespectsRange(t *testing.T) {
 	men := bls.Series{
 		ID: "LNS14000001", Label: "Men, 16+", SeasonallyAdjusted: true,

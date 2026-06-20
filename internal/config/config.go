@@ -18,6 +18,10 @@ type Config struct {
 	// service falls back to the public (keyless) rate limits.
 	BLSAPIKey string
 
+	// CensusAPIKey is the U.S. Census Bureau API key. Required for Census data
+	// (the API rejects keyless requests); empty disables the Census source.
+	CensusAPIKey string
+
 	// HTTPAddr is the listen address for the HTTP server, e.g. ":8080".
 	HTTPAddr string
 
@@ -67,6 +71,7 @@ func Load() (Config, error) {
 
 	cfg := Config{
 		BLSAPIKey:       getenv("BLS_API_KEY", ""),
+		CensusAPIKey:    getenv("CENSUS_API_KEY", ""),
 		HTTPAddr:        getenv("HTTP_ADDR", ":8080"),
 		DataDir:         getenv("DATA_DIR", "./data"),
 		AdminToken:      getenv("ADMIN_TOKEN", ""),

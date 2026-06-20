@@ -20,6 +20,7 @@ type ChartData struct {
 	Subtitle           string        `json:"subtitle,omitempty"`
 	Units              string        `json:"units"`
 	Source             string        `json:"source"`
+	Chart              string        `json:"chart,omitempty"`
 	SeasonallyAdjusted bool          `json:"seasonally_adjusted"`
 	X                  Axis          `json:"x"`
 	Series             []ChartSeries `json:"series"`
@@ -79,7 +80,10 @@ func Merge(v View, seriesByID map[string]bls.Series, start, end string) ChartDat
 	}
 
 	axisLabel, period := "Month", "months"
-	if v.Annual {
+	switch {
+	case v.Chart == "pyramid":
+		axisLabel, period = "Age", "age groups"
+	case v.Annual:
 		axisLabel, period = "Year", "years"
 	}
 	source := defaultSource
@@ -93,6 +97,7 @@ func Merge(v View, seriesByID map[string]bls.Series, start, end string) ChartDat
 		Subtitle: v.Subtitle,
 		Units:    v.Units,
 		Source:   source,
+		Chart:    v.Chart,
 		X:        Axis{Label: axisLabel, Values: dates},
 		Meta:     ChartMeta{Points: len(dates), Period: period},
 	}

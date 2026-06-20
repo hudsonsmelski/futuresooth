@@ -9,8 +9,11 @@
   --maxw: 880px;
 }
 
+/* Dark palette. Applied when the OS prefers dark (unless the user forced light
+   with the toggle), or whenever the user explicitly chose dark. Same colors as
+   before — the toggle only changes which palette is active, not the contrast. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0f1419;
     --fg: #e6e8eb;
     --muted: #9aa4b2;
@@ -18,6 +21,14 @@
     --accent: #58a6ff;
     --card-bg: #161b22;
   }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1419;
+  --fg: #e6e8eb;
+  --muted: #9aa4b2;
+  --line: #2a2f37;
+  --accent: #58a6ff;
+  --card-bg: #161b22;
 }
 
 * { box-sizing: border-box; }
@@ -37,12 +48,16 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
+  display: flex;
+  align-items: center;
   background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
 /* The whole top bar is one link to home, so the entire padded area is clickable.
    Everything stays on one line (nowrap); overflow truncates with an ellipsis. */
 .site-header-link {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-wrap: nowrap;
   align-items: baseline;
@@ -52,6 +67,19 @@ body {
   color: inherit;
   overflow: hidden;
 }
+
+/* Theme toggle sits at the right edge of the bar, outside the home link. */
+.theme-toggle {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0.5rem 0.9rem;
+  color: var(--fg);
+}
+.theme-toggle:hover { opacity: 0.7; }
 .brand { font-weight: 650; color: var(--fg); white-space: nowrap; flex-shrink: 0; }
 .brand-sub {
   color: var(--muted);
@@ -85,7 +113,17 @@ body {
 .container {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 1rem 1rem 2rem;
+  padding: 0rem 0rem 2rem;
+}
+
+/* Desktop widescreen: halve the side margins so content/charts grow wider.
+   New content width = (viewport + base width) / 2, i.e. each side margin is half
+   the original (viewport - base width)/2, capped so charts don't get absurd. */
+@media (min-width: 1024px) {
+  .container,
+  .site-footer {
+    max-width: min(1600px, calc((100vw + var(--maxw)) / 2));
+  }
 }
 
 .page-title { font-size: 1.4rem; margin: 0.6rem 0 0.3rem; }
@@ -130,15 +168,37 @@ body {
 /* Charts: a vertical list of chart blocks. */
 .chart-block {
   margin: 1.5rem 0;
-  padding-top: 1.25rem;
+  padding-top: 0.0rem;
   border-top: 1px solid var(--line);
 }
-.chart-block:first-of-type { border-top: none; padding-top: 0.25rem; }
+.chart-block:first-of-type { border-top: none; padding-top: 0.0rem; }
 .chart-title { font-size: 1.1rem; margin: 0 0 0.15rem; }
 .chart-sub { color: var(--muted); font-size: 0.88rem; margin: 0 0 0.5rem; }
 .chart { width: 100%; }
 .chart figure { margin: 0; } /* Plot wraps output in a <figure> when a legend is shown */
 .chart-caption { color: var(--muted); font-size: 0.82rem; margin-top: 0.5rem; }
+
+/* Large screens: go full-width (just 1rem of breathing room) and lay the charts
+   out in two columns. Below this width .chart-grid is a plain block, so the
+   chart-blocks stack in one column as before. */
+@media (min-width: 1280px) {
+  .container,
+  .site-footer {
+    max-width: none;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 2rem;
+  }
+  .chart-grid .chart-block {
+    margin: 1rem 0;
+    border-top: none;
+    padding-top: 0;
+  }
+}
 
 /* Observable Plot hover tooltip: force readable white-on-dark in any theme.
    By default the tip box uses --plot-background (white), so in dark mode the

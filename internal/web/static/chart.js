@@ -25,6 +25,16 @@
     return rows;
   }
 
+  // compact formats large numbers for axes/labels: millions and billions are
+  // abbreviated (e.g. 203000000 -> "203M"), smaller numbers keep separators.
+  const compact = (n) => {
+    const a = Math.abs(n);
+    const trim = (x) => x.toFixed(1).replace(/\.0$/, "");
+    if (a >= 1e9) return trim(n / 1e9) + "B";
+    if (a >= 1e6) return trim(n / 1e6) + "M";
+    return n.toLocaleString();
+  };
+
   // colorScale builds an explicit color mapping when every series carries a
   // color hint; otherwise it falls back to Plot's default scheme.
   function colorScale(chart, multi) {
@@ -36,7 +46,46 @@
     return opt;
   }
 
+  // renderPyramid draws a back-to-back population pyramid: x-values are age
+  // bands, series are Male (drawn left/negative) and Female (right/positive).
+  function renderPyramid(el, chart) {
+    const bands = chart.x.values;
+    const rows = [];
+    for (const s of chart.series) {
+      const sign = s.label.toLowerCase() === "male" ? -1 : 1;
+      for (let i = 0; i < bands.length; i++) {
+        const v = s.values[i];
+        rows.push({ age: bands[i], series: s.label, pop: v == null ? null : sign * v });
+      }
+    }
+    const width = el.clientWidth || 640;
+    const male = rows.filter((r) => r.pop != null && r.pop < 0);
+    const female = rows.filter((r) => r.pop != null && r.pop > 0);
+    const fig = Plot.plot({
+      width,
+      height: Math.max(380, bands.length * 22),
+      marginLeft: 52,
+      marginRight: 44,
+      x: { label: chart.units || "Population", tickFormat: (d) => compact(Math.abs(d)), grid: true },
+      y: { domain: [...bands].reverse(), label: "Age" }, // oldest at top
+      color: colorScale(chart, true),
+      marks: [
+        Plot.barX(rows, { y: "age", x: "pop", fill: "series" }),
+        // Count labels just past each bar's tip so values are readable at a glance.
+        Plot.text(male, { y: "age", x: "pop", text: (d) => compact(-d.pop), textAnchor: "end", dx: 30, fontSize: 10 }),
+        Plot.text(female, { y: "age", x: "pop", text: (d) => compact(d.pop), textAnchor: "start", dx: -30, fontSize: 10 }),
+        Plot.ruleX([0]),
+        Plot.tip(rows, Plot.pointer({ y: "age", x: "pop", fill: "series" })),
+      ],
+    });
+    el.replaceChildren(fig);
+  }
+
   function renderOne(el, chart) {
+    if (chart.chart === "pyramid") {
+      renderPyramid(el, chart);
+      return;
+    }
     const multi = chart.series.length > 1;
     const yLabel = chart.units === "percent" ? "% unemployed" : chart.units;
     const rows = buildRows(chart);
@@ -47,7 +96,7 @@
       marginLeft: 48,
       marginBottom: 32,
       x: { type: "time", label: null, grid: true },
-      y: { label: yLabel, grid: true, zero: true },
+      y: { label: yLabel, grid: true, zero: true, tickFormat: compact },
       color: colorScale(chart, multi),
       marks: [
         Plot.ruleY([0]),
