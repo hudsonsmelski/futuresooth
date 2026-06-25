@@ -10,6 +10,9 @@ A small, dependency-free Go project in two parts:
 - **Web service** (`cmd/web`) — a responsive web app that renders the
   charts with [Observable Plot](https://observablehq.com/plot/).
 
+![Alt Text](pics/Screenshot_Index.png)
+![Alt Text](pics/Screenshot_Lightmode_Index.png)
+
 Datasets:
 
 - **Unemployment Rate** — U.S. unemployment (overall + by sex, race/ethnicity,
@@ -27,6 +30,10 @@ Datasets:
 - **Population** — U.S. population as an age/sex pyramid (PEP) plus population by
   race and by Hispanic origin over time (ACS 1-year), from the
   [Census Bureau](https://www.census.gov/) (requires `CENSUS_API_KEY`).
+
+![Alt Text](pics/Screenshot_Vertical.png)
+![Alt Text](pics/Screenshot_Horizontal.png)
+![Alt Text](pics/Screenshot_Lightmode_Population.png)
 
 ## Configuration
 
